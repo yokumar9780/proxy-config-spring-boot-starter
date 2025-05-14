@@ -3,12 +3,17 @@ name: Deploy to GitHub Packages
 on:
   push:
     tags:
-      - 'v*.*.*'  # e.g., v1.0.0
+      - 'v*.*.*' # e.g., v1.0.0
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
-
+    permissions:
+      id-token: write
+      contents: read
+      packages: read
+      pull-requests: write
+      security-events: write
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -35,7 +40,15 @@ jobs:
           </settings>
           EOF
 
+      - name: Verify GitHub Token Permissions
+        run: |
+          echo "Checking GitHub token permissions..."
+          curl -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
+               -H "Accept: application/vnd.github.v3+json" \
+               https://api.github.com/user/packages
+
       - name: Deploy to GitHub Packages
         run: mvn deploy -DskipTests
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # Built-in GitHub token
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # Built-in GitHub token
+          # The token must have the write:packages and read:packages permissions.
