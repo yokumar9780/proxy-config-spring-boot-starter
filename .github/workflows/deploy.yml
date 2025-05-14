@@ -51,6 +51,12 @@ jobs:
         id: extract_version
         run: echo "::set-output name=version::${GITHUB_REF#refs/tags/v}"
 
+      - name: Debug Current Branch or Tag
+        run: |
+          echo "Current ref: ${{ github.ref }}"
+          echo "Current ref name: ${{ github.ref_name }}"
+          git branch --show-current
+
       - name: Set Project Version
         run: |
           mvn versions:set -DnewVersion=${{ steps.extract_version.outputs.version }}
@@ -58,7 +64,7 @@ jobs:
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add pom.xml
           git commit -m "Set project version to ${{ steps.extract_version.outputs.version }}"
-          git push --force origin HEAD:${{ github.ref_name }}
+          git push --force origin HEAD:refs/heads/master
 
       - name: Verify Updated pom.xml
         run: cat pom.xml
