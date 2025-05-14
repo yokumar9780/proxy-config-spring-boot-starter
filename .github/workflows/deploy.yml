@@ -11,7 +11,7 @@ jobs:
     permissions:
       id-token: write
       contents: read
-      packages: read
+      packages: write
       pull-requests: write
       security-events: write
     steps:
@@ -45,7 +45,7 @@ jobs:
           echo "Checking GitHub token permissions..."
           curl -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
                -H "Accept: application/vnd.github.v3+json" \
-               https://api.github.com/user/packages
+               "https://api.github.com/user/packages?package_type=maven"
 
       - name: Deploy to GitHub Packages
         run: mvn deploy -DskipTests
