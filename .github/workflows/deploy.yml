@@ -47,6 +47,13 @@ jobs:
                -H "Accept: application/vnd.github.v3+json" \
                "https://api.github.com/user/packages?package_type=maven"
 
+      - name: Extract Version from Tag
+        id: extract_version
+        run: echo "::set-output name=version::${GITHUB_REF#refs/tags/v}"
+
+      - name: Set Project Version
+        run: mvn versions:set -DnewVersion=${{ steps.extract_version.outputs.version }}
+
       - name: Deploy to GitHub Packages
         run: mvn deploy -DskipTests
         env:
