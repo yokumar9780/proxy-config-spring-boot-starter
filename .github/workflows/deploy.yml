@@ -60,6 +60,9 @@ jobs:
           git commit -m "Set project version to ${{ steps.extract_version.outputs.version }}"
           git push --force origin HEAD:${{ github.ref_name }}
 
+      - name: Verify Updated pom.xml
+        run: cat pom.xml
+
       - name: Deploy to GitHub Packages
         run: mvn deploy -DskipTests
         env:
