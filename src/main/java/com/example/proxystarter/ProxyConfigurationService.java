@@ -10,10 +10,16 @@ import org.apache.hc.core5.http.HttpHost;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
+import org.springframework.http.client.SimpleClientHttpRequestFactory;
+import org.springframework.security.oauth2.jwt.JwtDecoder;
+import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
+import org.springframework.web.client.RestClient;
 import org.springframework.web.client.RestTemplate;
 
 import java.net.Authenticator;
+import java.net.InetSocketAddress;
 import java.net.PasswordAuthentication;
+import java.net.Proxy;
 
 /**
  * Service responsible for configuring system-wide proxy settings.
@@ -93,7 +99,55 @@ public class ProxyConfigurationService {
         }
 
         LOGGER.info("Creating RestTemplate with proxy configuration");
+        CloseableHttpClient httpClient = getCloseableHttpClient();
+        HttpComponentsClientHttpRequestFactory factory = new HttpComponentsClientHttpRequestFactory(httpClient);
+        return new RestTemplate(factory);
+    }
 
+
+    public RestClient createProxyEnabledRestClient() {
+
+        if (!proxyProperties.enabled() || proxyProperties.host() == null || proxyProperties.host().isEmpty()) {
+            LOGGER.info("Creating default RestClient without proxy");
+            return RestClient.builder()
+                    .defaultHeaders(headers -> headers.set("Accept", "application/json"))
+                    .requestFactory(new HttpComponentsClientHttpRequestFactory())
+                    .build();
+        }
+
+        LOGGER.info("Creating RestClient with proxy configuration");
+
+        CloseableHttpClient httpClient = getCloseableHttpClient();
+        HttpComponentsClientHttpRequestFactory factory = new HttpComponentsClientHttpRequestFactory(httpClient);
+
+        return RestClient.builder()
+                .defaultHeaders(headers -> headers.set("Accept", "application/json"))
+                .requestFactory(factory)
+                .build();
+    }
+
+
+    public JwtDecoder createProxyEnabledJwtDecoder(String jwkSetUri) {
+        if (!proxyProperties.enabled() || proxyProperties.host() == null || proxyProperties.host().isEmpty()) {
+            LOGGER.info("Creating default JwtDecoder without proxy");
+            return  NimbusJwtDecoder.withJwkSetUri(jwkSetUri)
+                    .restOperations(new RestTemplate())
+                    .build();
+        }
+        LOGGER.info("Creating JwtDecoder with proxy configuration");
+        // Create a RestTemplate with proxy settings
+        RestTemplate restTemplate = new RestTemplate();
+        SimpleClientHttpRequestFactory requestFactory = new SimpleClientHttpRequestFactory();
+        requestFactory.setProxy(new Proxy(Proxy.Type.HTTP, new InetSocketAddress(proxyProperties.host(), proxyProperties.port())));
+        restTemplate.setRequestFactory(requestFactory);
+
+        // Create NimbusJwtDecoder with RestTemplate
+        return NimbusJwtDecoder.withJwkSetUri(jwkSetUri)
+                .restOperations(restTemplate)
+                .build();
+    }
+
+    private CloseableHttpClient getCloseableHttpClient() {
         HttpHost proxy = new HttpHost(proxyProperties.host(), proxyProperties.port());
         CloseableHttpClient httpClient = HttpClients.custom()
                 .setProxy(proxy)
@@ -113,9 +167,7 @@ public class ProxyConfigurationService {
                     .setDefaultCredentialsProvider(credentialsProvider)
                     .build();
         }
-
-        HttpComponentsClientHttpRequestFactory factory = new HttpComponentsClientHttpRequestFactory(httpClient);
-
-        return new RestTemplate(factory);
+        return httpClient;
     }
+
 }
