@@ -1,1 +1,2 @@
-org.springframework.boot.autoconfigure.EnableAutoConfiguration=com.example.proxystarter.ProxyAutoConfiguration
+org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
+com.example.proxystarter.ProxyAutoConfiguration
