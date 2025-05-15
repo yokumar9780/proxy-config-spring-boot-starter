@@ -81,7 +81,7 @@ You can autowire the `ProxyConfigurationService` to access its functionality:
 ```java
 
 @Autowired
-private RestTemplate proxiedRestTemplate;
+private RestTemplate restTemplate;
 
 // Then use it as usual:
 String result = proxiedRestTemplate.getForObject("https://example.com/api", String.class);
@@ -95,15 +95,16 @@ To release a new version:
 git tag v1.0.0
 git push origin v1.0.0
 ```
+
 This will trigger a GitHub Actions workflow that builds and deploys the starter to GitHub Packages.
 
 ## Building from Source
 
 To build the project from source, you need:
 
-* Java 21
-* Spring Boot 3.4.0+
-* Public GitHub repository
+- Java 21
+- Spring Boot 3.4.0+
+- Public GitHub repository
 
 Run the following command:
 
@@ -114,3 +115,7 @@ mvn clean install
 ## License
 
 This project is licensed under the MIT License - see the LICENSE file for details.
+
+## Additional Documentation
+
+For more detailed information, refer to the [ProxyConfigGuide.md](ProxyConfigGuide.md) file.
