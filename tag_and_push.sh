@@ -16,7 +16,7 @@ NEW_VERSION="$MAJOR.$MINOR.$PATCH"
 
 # Run the git commands
 echo "Tagging version v$NEW_VERSION and pushing to origin..."
-#git tag "v$NEW_VERSION"
-#git push origin "v$NEW_VERSION"
+git tag "v$NEW_VERSION"
+git push origin "v$NEW_VERSION"
 
 echo "Done."
