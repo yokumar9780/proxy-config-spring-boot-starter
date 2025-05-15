@@ -197,7 +197,7 @@ The Proxy Config Spring Boot Starter is a valuable tool for organizations that n
 
 Whether you’re a developer or a business stakeholder, this tool helps save time, improve security, and make applications easier to manage.
 
-GitHub Repository
+## GitHub Repository
 You can find the source code and additional documentation for this project in the GitHub repository:
 
 [Proxy Config Spring Boot Starter GitHub Repository](https://github.com/yokumar9780/proxy-config-spring-boot-starter)
