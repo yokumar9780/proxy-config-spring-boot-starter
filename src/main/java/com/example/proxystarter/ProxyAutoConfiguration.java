@@ -8,7 +8,6 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Conditional;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.web.client.RestClient;
@@ -39,17 +38,17 @@ public class ProxyAutoConfiguration {
     }
 
     @Bean
-    @ConditionalOnMissingBean(name = "proxyEnabledRestTemplate")
-    @ConditionalOnProperty(prefix = "proxy", name = "enabled", havingValue = "true")
-    public RestTemplate proxyEnabledRestTemplate(ProxyConfigurationService proxyConfigurationService) {
+    @ConditionalOnMissingBean(RestTemplate.class)
+    //@ConditionalOnProperty(prefix = "proxy", name = "enabled", havingValue = "true")
+    public RestTemplate restTemplate(ProxyConfigurationService proxyConfigurationService) {
         LOGGER.info("Creating proxy-enabled RestTemplate bean");
         return proxyConfigurationService.createProxyEnabledRestTemplate();
     }
 
     @Bean
-    @ConditionalOnMissingBean(name = "proxyEnabledRestClient")
-    @ConditionalOnProperty(prefix = "proxy", name = "enabled", havingValue = "true")
-    public RestClient proxyEnabledRestClient(ProxyConfigurationService proxyConfigurationService) {
+    @ConditionalOnMissingBean(RestClient.class)
+    //@ConditionalOnProperty(prefix = "proxy", name = "enabled", havingValue = "true")
+    public RestClient restClient(ProxyConfigurationService proxyConfigurationService) {
         LOGGER.info("Creating proxy-enabled RestClient bean");
         return proxyConfigurationService.createProxyEnabledRestClient();
     }
@@ -57,7 +56,8 @@ public class ProxyAutoConfiguration {
     @Bean
     @ConditionalOnMissingBean
     @ConditionalOnClass(name = "org.springframework.security.oauth2.jwt.JwtDecoder")
-    @Conditional(JwtAndProxyCondition.class)
+    //@Conditional(JwtAndProxyCondition.class)
+    @ConditionalOnProperty(prefix = "spring.security.oauth2.resourceserver.jwt", name = "jwk-set-uri")
     public JwtDecoder jwtDecoder(ProxyConfigurationService proxyConfigurationService,
                                  @Value("${spring.security.oauth2.resourceserver.jwt.jwk-set-uri}") String jwkSetUri) {
         LOGGER.info("Creating proxy-enabled jwtDecoder bean");

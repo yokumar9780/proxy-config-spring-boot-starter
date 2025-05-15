@@ -13,7 +13,6 @@ import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.http.client.SimpleClientHttpRequestFactory;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
-import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClient;
 import org.springframework.web.client.RestTemplate;
 
@@ -25,7 +24,7 @@ import java.net.Proxy;
 /**
  * Service responsible for configuring system-wide proxy settings.
  */
-@Service
+
 public class ProxyConfigurationService {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ProxyConfigurationService.class);
