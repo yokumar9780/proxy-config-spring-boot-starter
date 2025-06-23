@@ -1,6 +1,5 @@
 package com.example.proxystarter;
 
-import static org.assertj.core.api.Assertions.assertThat;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -11,6 +10,8 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.web.client.RestTemplate;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 class ProxyAutoConfigurationTest {
 
@@ -52,12 +53,14 @@ class ProxyAutoConfigurationTest {
     @Test
     void whenJwtUriPropertySet_thenJwtDecoderBeanCreated() {
         contextRunner.withPropertyValues(
-                "spring.security.oauth2.resourceserver.jwt.jwk-set-uri=https://example.com/jwk",
-                "proxy.enabled=true"
-        ).run(context -> {
-            assertThat(context).hasSingleBean(JwtDecoder.class);
-            assertThat(context.getBean(JwtDecoder.class)).isNotNull();
-        });
+                        "spring.security.oauth2.resourceserver.jwt.jwk-set-uri=https://example.com/jwk",
+                        "proxy.enabled=true"
+                )
+                .withConfiguration(AutoConfigurations.of(JwtDecoderConfiguration.class))
+                .run(context -> {
+                    assertThat(context).hasSingleBean(JwtDecoder.class);
+                    assertThat(context.getBean(JwtDecoder.class)).isInstanceOf(JwtDecoder.class);
+                });
     }
 
     @Test
@@ -66,9 +69,20 @@ class ProxyAutoConfigurationTest {
                 "spring.security.oauth2.resourceserver.jwt.jwk-set-uri=https://example.com/jwk",
                 "proxy.enabled=false"
         ).run(context -> {
-            assertThat(context).hasSingleBean(JwtDecoder.class);
-            assertThat(context.getBean(JwtDecoder.class)).isNotNull();
+            assertThat(context).doesNotHaveBean(JwtDecoder.class);
         });
+    }
+
+    @Test
+    void whenJwtUriPropertySet_thenJwtDecoderBeanCreated_WITH_JWT() {
+        contextRunner.withPropertyValues(
+                        "spring.security.oauth2.resourceserver.jwt.jwk-set-uri=https://example.com/jwk",
+                        "proxy.enabled=false"
+                )
+                .withConfiguration(AutoConfigurations.of(JwtDecoderConfiguration.class))
+                .run(context -> {
+                    assertThat(context).hasSingleBean(JwtDecoder.class);
+                });
     }
 
     @Configuration

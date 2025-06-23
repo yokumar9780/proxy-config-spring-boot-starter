@@ -11,8 +11,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.http.client.SimpleClientHttpRequestFactory;
-import org.springframework.security.oauth2.jwt.JwtDecoder;
-import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
 import org.springframework.web.client.RestClient;
 import org.springframework.web.client.RestTemplate;
 
@@ -127,25 +125,6 @@ public class ProxyConfigurationService {
     }
 
 
-    public JwtDecoder createProxyEnabledJwtDecoder(String jwkSetUri) {
-        if (!proxyProperties.enabled() || proxyProperties.host() == null || proxyProperties.host().isEmpty()) {
-            LOGGER.info("Creating default JwtDecoder without proxy");
-            return NimbusJwtDecoder.withJwkSetUri(jwkSetUri)
-                    .restOperations(new RestTemplate())
-                    .build();
-        }
-        LOGGER.info("Creating JwtDecoder with proxy configuration");
-        // Create a RestTemplate with proxy settings
-        RestTemplate restTemplate = new RestTemplate();
-        SimpleClientHttpRequestFactory requestFactory = new SimpleClientHttpRequestFactory();
-        requestFactory.setProxy(new Proxy(Proxy.Type.HTTP, new InetSocketAddress(proxyProperties.host(), proxyProperties.port())));
-        restTemplate.setRequestFactory(requestFactory);
-
-        // Create NimbusJwtDecoder with RestTemplate
-        return NimbusJwtDecoder.withJwkSetUri(jwkSetUri)
-                .restOperations(restTemplate)
-                .build();
-    }
 
     private CloseableHttpClient getCloseableHttpClient() {
         HttpHost proxy = new HttpHost(proxyProperties.host(), proxyProperties.port());
