@@ -112,6 +112,11 @@ Run the following command:
 mvn clean install
 ```
 
+## Links
+* [Medium.com](https://medium.com/@yokum.9780/proxy-config-spring-boot-starter-simplifying-proxy-configuration-for-spring-applications-682bc60b3fd2)
+
+* [dev.to](https://dev.to/yogesh_kumar_9780/proxy-config-spring-boot-starter-simplifying-proxy-configuration-for-applications-2b5f)
+
 ## License
 
 This project is licensed under the MIT License - see the LICENSE file for details.
